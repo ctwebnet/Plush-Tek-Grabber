@@ -1,112 +1,67 @@
-// Select Elements
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const scoreDisplay = document.getElementById("score");
-const grabSound = document.getElementById("grab-sound");
-const winSound = document.getElementById("win-sound");
+// script.js - 3D Claw Machine using Three.js
 
-// Set Canvas Dimensions
-canvas.width = 400;
-canvas.height = 500;
+// Initialize Scene, Camera, and Renderer
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-// Game Variables
-let clawX = canvas.width / 2 - 25;
-let clawY = 50;
-let clawWidth = 50;
-let clawHeight = 20;
-let clawSpeed = 5;
-let movingDown = false;
-let score = 0;
-let gameOver = false;
+// Claw (Box)
+const clawGeometry = new THREE.BoxGeometry(1, 0.5, 1);
+const clawMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const claw = new THREE.Mesh(clawGeometry, clawMaterial);
+claw.position.y = 3;
+scene.add(claw);
+
+// Ground (Table)
+const groundGeometry = new THREE.PlaneGeometry(10, 10);
+const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x666666, side: THREE.DoubleSide });
+const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -1;
+scene.add(ground);
 
 // Plush Toys
-const plushies = [];
-const numPlushies = 6;
-for (let i = 0; i < numPlushies; i++) {
-    plushies.push({
-        x: Math.random() * (canvas.width - 40),
-        y: Math.random() * (canvas.height - 100) + 150,
-        width: 40,
-        height: 40,
-        value: Math.floor(Math.random() * 50) + 50, // Plush value: 50-100 points
-        grabbed: false
-    });
+const plushToys = [];
+for (let i = 0; i < 5; i++) {
+    const plushGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+    const plushMaterial = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+    const plush = new THREE.Mesh(plushGeometry, plushMaterial);
+    plush.position.set(Math.random() * 6 - 3, -0.5, Math.random() * 6 - 3);
+    scene.add(plush);
+    plushToys.push(plush);
 }
+
+// Camera Position
+camera.position.set(0, 5, 8);
+camera.lookAt(0, 0, 0);
 
 // Controls
-document.addEventListener("keydown", (e) => {
-    if (gameOver) return;
-
-    if (e.key === "ArrowLeft" && clawX > 0) {
-        clawX -= clawSpeed;
-    }
-    if (e.key === "ArrowRight" && clawX < canvas.width - clawWidth) {
-        clawX += clawSpeed;
-    }
-    if (e.key === " " && !movingDown) {
-        movingDown = true;
-    }
+let movingDown = false;
+document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" && claw.position.x > -3) claw.position.x -= 0.5;
+    if (event.key === "ArrowRight" && claw.position.x < 3) claw.position.x += 0.5;
+    if (event.key === " " && !movingDown) movingDown = true;
 });
 
-// Game Loop
-function gameLoop() {
-    if (gameOver) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw Claw
-    ctx.fillStyle = "black";
-    ctx.fillRect(clawX, clawY, clawWidth, clawHeight);
-    
-    // Draw Plushies
-    plushies.forEach(plush => {
-        if (!plush.grabbed) {
-            ctx.fillStyle = "gray";
-            ctx.fillRect(plush.x, plush.y, plush.width, plush.height);
-        }
-    });
-
-    // Claw Movement Logic
+function animate() {
+    requestAnimationFrame(animate);
     if (movingDown) {
-        clawY += 5;
-        if (clawY > canvas.height - 60) {
-            let grabbedPlush = false;
-            
-            plushies.forEach(plush => {
-                if (
-                    !plush.grabbed &&
-                    clawX < plush.x + plush.width &&
-                    clawX + clawWidth > plush.x &&
-                    clawY + clawHeight > plush.y
-                ) {
-                    plush.grabbed = true;
-                    score += plush.value;
-                    grabbedPlush = true;
-                    grabSound.play();
+        claw.position.y -= 0.1;
+        if (claw.position.y <= -0.5) {
+            plushToys.forEach((plush) => {
+                if (Math.abs(plush.position.x - claw.position.x) < 0.6 &&
+                    Math.abs(plush.position.z - claw.position.z) < 0.6) {
+                    plush.position.y = claw.position.y;
                 }
             });
-
             setTimeout(() => {
-                clawY = 50;
+                claw.position.y = 3;
                 movingDown = false;
             }, 500);
-
-            if (grabbedPlush) {
-                scoreDisplay.innerText = `Score: ${score}`;
-            }
-
-            // Check for Game Over
-            if (plushies.every(plush => plush.grabbed)) {
-                setTimeout(() => {
-                    winSound.play();
-                    alert("You won! Final Score: " + score);
-                    gameOver = true;
-                }, 800);
-            }
         }
     }
-
-    requestAnimationFrame(gameLoop);
+    renderer.render(scene, camera);
 }
-
-gameLoop();
+animate();
