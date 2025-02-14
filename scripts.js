@@ -42,8 +42,8 @@ let movingDown = false;
 document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft" && claw.position.x > -3) claw.position.x -= 0.5;
     if (event.key === "ArrowRight" && claw.position.x < 3) claw.position.x += 0.5;
-    if (event.key === "ArrowUp" && claw.position.y < 3) claw.position.y -= 0.5;
-    if (event.key === "ArrowDown" && claw.position.y > -3) claw.position.y -= 0.5;
+    if (event.key === "ArrowUp" && claw.position.z < 3) claw.position.Z -= 0.5;
+    if (event.key === "ArrowDown" && claw.position.z > -3) claw.position.z -= 0.5;
        if (event.key === " " && !movingDown) movingDown = true;
 });
 
