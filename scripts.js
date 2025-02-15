@@ -40,13 +40,13 @@ camera.lookAt(0, 0, 0);
 // Controls
 let movingDown = false;
 document.addEventListener("keydown", (event) => {
-    // Left and Right movement along the X-axis
-    if (event.key === "ArrowLeft" && claw.position.x > -3) claw.position.x -= 0.5;
-    if (event.key === "ArrowRight" && claw.position.x < 3) claw.position.x += 0.5;
+    // Left and Right movement along the X-axis (A & D keys)
+    if (event.key === "a" && claw.position.x > -3) claw.position.x -= 0.5;
+    if (event.key === "d" && claw.position.x < 3) claw.position.x += 0.5;
     
-    // Forward and Backward movement along the Z-axis
-    if (event.key === "ArrowUp" && claw.position.z > -3) claw.position.z -= 0.5;
-    if (event.key === "ArrowDown" && claw.position.z < 3) claw.position.z += 0.5;
+    // Forward and Backward movement along the Z-axis (W & S keys)
+    if (event.key === "w" && claw.position.z > -3) claw.position.z -= 0.5;
+    if (event.key === "s" && claw.position.z < 3) claw.position.z += 0.5;
     
     // Drop the claw when Spacebar is pressed
     if (event.key === " " && !movingDown) movingDown = true;
@@ -79,4 +79,3 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
-
