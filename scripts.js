@@ -40,30 +40,43 @@ camera.lookAt(0, 0, 0);
 // Controls
 let movingDown = false;
 document.addEventListener("keydown", (event) => {
+    // Left and Right movement along the X-axis
     if (event.key === "ArrowLeft" && claw.position.x > -3) claw.position.x -= 0.5;
     if (event.key === "ArrowRight" && claw.position.x < 3) claw.position.x += 0.5;
-    if (event.key === "ArrowUp" && claw.position.z < 3) claw.position.Z -= 0.5;
-    if (event.key === "ArrowDown" && claw.position.z > -3) claw.position.z -= 0.5;
-       if (event.key === " " && !movingDown) movingDown = true;
+    
+    // Forward and Backward movement along the Z-axis
+    if (event.key === "ArrowUp" && claw.position.z > -3) claw.position.z -= 0.5;
+    if (event.key === "ArrowDown" && claw.position.z < 3) claw.position.z += 0.5;
+    
+    // Drop the claw when Spacebar is pressed
+    if (event.key === " " && !movingDown) movingDown = true;
 });
 
 function animate() {
     requestAnimationFrame(animate);
+    
     if (movingDown) {
+        // Lower the claw
         claw.position.y -= 0.1;
         if (claw.position.y <= -0.5) {
+            // Check if the claw is close enough to a plush toy
             plushToys.forEach((plush) => {
                 if (Math.abs(plush.position.x - claw.position.x) < 0.6 &&
                     Math.abs(plush.position.z - claw.position.z) < 0.6) {
+                    // Attach the plush toy to the claw
                     plush.position.y = claw.position.y;
                 }
             });
+            
+            // Reset the claw position after a short delay
             setTimeout(() => {
                 claw.position.y = 3;
                 movingDown = false;
             }, 500);
         }
     }
+    
     renderer.render(scene, camera);
 }
 animate();
+
