@@ -72,17 +72,22 @@ function animate() {
     if (movingDown) {
         // Lower the claw
         claw.position.y -= 0.1;
-        if (claw.position.y <= -0.5) {
-            // Check if the claw is close enough to a plush toy
-            plushToys.forEach((plush) => {
-                if (Math.abs(plush.position.x - claw.position.x) < 0.6 &&
-                    Math.abs(plush.position.z - claw.position.z) < 0.6) {
-                    // Attach the plush toy to the claw
-                    plush.position.y = claw.position.y;
-                }
-            });
-            
-            // Reset the claw position after a short delay
+        
+        // Check if the claw is close enough to a plush toy
+        let grabbed = false;
+        plushToys.forEach((plush) => {
+            if (!grabbed && Math.abs(plush.position.x - claw.position.x) < 0.6 &&
+                Math.abs(plush.position.z - claw.position.z) < 0.6 &&
+                Math.abs(plush.position.y - claw.position.y) < 0.6) {
+                // Attach the plush toy to the claw and stop movement
+                plush.position.y = claw.position.y;
+                movingDown = false; // Stop claw movement once it interacts
+                grabbed = true;
+            }
+        });
+        
+        // Reset the claw position after a short delay if no toy is grabbed
+        if (!grabbed && claw.position.y <= -0.5) {
             setTimeout(() => {
                 claw.position.y = 3;
                 movingDown = false;
