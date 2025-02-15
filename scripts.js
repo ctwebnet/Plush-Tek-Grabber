@@ -22,15 +22,29 @@ ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1;
 scene.add(ground);
 
-// Plush Toys
+// Plush Toys - Multiple Layers with Higher Points at the Bottom
 const plushToys = [];
-for (let i = 0; i < 5; i++) {
-    const plushGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-    const plushMaterial = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
-    const plush = new THREE.Mesh(plushGeometry, plushMaterial);
-    plush.position.set(Math.random() * 6 - 3, -0.5, Math.random() * 6 - 3);
-    scene.add(plush);
-    plushToys.push(plush);
+const layers = 3; // Number of plush layers
+const plushPerLayer = 10; // Number of plush toys per layer
+
+for (let layer = 0; layer < layers; layer++) {
+    for (let i = 0; i < plushPerLayer; i++) {
+        const plushGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+        let colorValue = Math.random() * 0xffffff;
+        if (layer === 0) colorValue = 0xff0000; // Highest value toys (Red) at the bottom
+        if (layer === 1) colorValue = 0xffff00; // Medium value toys (Yellow) in the middle
+        if (layer === 2) colorValue = 0x00ff00; // Lowest value toys (Green) at the top
+        
+        const plushMaterial = new THREE.MeshBasicMaterial({ color: colorValue });
+        const plush = new THREE.Mesh(plushGeometry, plushMaterial);
+        plush.position.set(
+            Math.random() * 6 - 3, // Random X position
+            -0.5 + layer * 0.6,   // Stack plushies in layers
+            Math.random() * 6 - 3 // Random Z position
+        );
+        scene.add(plush);
+        plushToys.push(plush);
+    }
 }
 
 // Camera Position
